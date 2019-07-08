@@ -5,8 +5,8 @@ import java.util.*;
 public class Board {
 
     private HashMap<Long, Pit> pits = new HashMap<>();
-    private List<Integer> topPits = Arrays.asList(2,3,4,5,6,7);
-    private List<Integer> bottomPits = Arrays.asList(8,9,10,11,12,13);
+    private List<Long> topPits = Arrays.asList(2L,3L,4L,5L,6L,7L);
+    private List<Long> bottomPits = Arrays.asList(8L,9L,10L,11L,12L,13L);
 
     public Board() {}
 
@@ -14,16 +14,6 @@ public class Board {
         for(Long i = 1L; i < 15; i++) {
             pits.put(i, new Pit(i));
         }
-    }
-
-    public Pit getOppositePit(final Long startingPit, final PlayerPosition playerPosition) {
-        Long index = 0L;
-        if(playerPosition.equals(PlayerPosition.TOP)){
-            index = (long) topPits.indexOf(startingPit);
-        } else {
-            index = (long) bottomPits.indexOf(bottomPits);
-        }
-        return getPit(index);
     }
 
     public void clearBoard() {
