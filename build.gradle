@@ -4,7 +4,6 @@ plugins {
 }
 
 apply plugin: 'io.spring.dependency-management'
-
 group = 'uk.co.erlski'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
