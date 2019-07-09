@@ -5,6 +5,10 @@ import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 
+/**
+ * A DTO object that is used to return errors to the client when they arise
+ * @author Elliott Lewandowski
+ */
 public class ErrorDTO {
 
     private final String error;

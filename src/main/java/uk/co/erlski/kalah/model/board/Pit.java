@@ -2,6 +2,10 @@ package uk.co.erlski.kalah.model.board;
 
 import uk.co.erlski.kalah.model.enums.PlayerPosition;
 
+/**
+ * One of the 14 pits that make up a game of Kalah
+ * @author Elliott Lewandowski
+ */
 public class Pit {
 
     private final Long position;
@@ -9,7 +13,7 @@ public class Pit {
     private PlayerPosition owner;
     private int stones = 6;
 
-    public Pit(final Long position) {
+    Pit(final Long position) {
         this.position = position;
         if(isHomePit()) {
             this.stones = 0;
@@ -24,6 +28,11 @@ public class Pit {
 
 
     //TODO: this needs cleaning up/replacing
+
+    /**
+     * Determines and sets the {@link Pit} that lives
+     * opposite of the current instance of this Pit.
+     */
     private void setOpposite() {
         Long[] topPits = {2L, 3L, 4L, 5L, 6L, 7L};
         Long[] bottomPits = {8L, 9L, 10L, 11L, 12L, 13L};
