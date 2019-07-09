@@ -1,4 +1,6 @@
-package uk.co.erlski.kalah.model.game;
+package uk.co.erlski.kalah.model.board;
+
+import uk.co.erlski.kalah.model.enums.PlayerPosition;
 
 import java.util.*;
 
@@ -20,6 +22,7 @@ public class Board {
         pits.clear();
     }
 
+    //TODO: validation
     public Pit getPit(final Long position) {
         return pits.get(position);
     }

@@ -1,4 +1,6 @@
-package uk.co.erlski.kalah.model.game;
+package uk.co.erlski.kalah.model.board;
+
+import uk.co.erlski.kalah.model.enums.PlayerPosition;
 
 public class Pit {
 
@@ -27,13 +29,13 @@ public class Pit {
         Long[] bottomPits = {8L, 9L, 10L, 11L, 12L, 13L};
         if(this.owner.equals(PlayerPosition.TOP)) {
             for(int i = 0; i < topPits.length; i++) {
-                if(this.position == topPits[i]) {
+                if(this.position.equals(topPits[i])) {
                     this.opposite = bottomPits[i];
                 }
             }
         } else {
             for(int i = 0; i < topPits.length; i++) {
-                if(this.position == bottomPits[i]) {
+                if(this.position.equals(bottomPits[i])) {
                     this.opposite = topPits[i];
                 }
             }

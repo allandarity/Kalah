@@ -2,54 +2,68 @@ package uk.co.erlski.kalah.model.game;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import uk.co.erlski.kalah.exception.KalahException;
+import uk.co.erlski.kalah.model.board.Board;
+import uk.co.erlski.kalah.model.board.Pit;
+import uk.co.erlski.kalah.model.enums.PlayerPosition;
 
 public class Game {
 
     private static final Logger log = LogManager.getLogger(Game.class);
 
     private Board board;
-    private PlayerPosition lastPlayed = PlayerPosition.BOTTOM;
+    private PlayerPosition lastPlayed = PlayerPosition.TOP;
     private final Long gameId;
     private boolean gameIsLive = true;
+    private boolean redo = false;
 
-    public Game(final Long gameId) {
+    Game(final Long gameId) {
         log.info("game starting at game id " + gameId);
         this.gameId = gameId;
         setBoard(new Board());
     }
 
-
     /*
     TODO:
         Alternate turns between TOP/BOTTOM
         Have the game end - needs testing
+        Game state enum
      */
     public void playMove(final Long startingPosition) {
-        final PlayerPosition currentPlayer =
-                lastPlayed == PlayerPosition.BOTTOM
-                        ? PlayerPosition.TOP
-                        : PlayerPosition.BOTTOM;
-
+        redo = false;
+        log.info("Current player set as: " + this.getLastPlayed());
         final Pit startingPit = board.getPit(startingPosition);
 
         int numberOfStones = startingPit.getStones();
         Pit currentPit = startingPit;
         do {
-            if (isLegalMove(startingPosition)) {
+            if (isLegalMove(startingPit)) {
                 Pit next = getNextPit(currentPit.getPosition());
                 if(startingPit.getStones() == 1 && next.getStones() == 0) {
-                    stealStones(currentPlayer, startingPit);
+                    stealStones(getLastPlayed(), next);
                 }
                 next.setStones(1);
                 log.info(next + " added 1 stone" + numberOfStones);
                 currentPit = next;
+                startingPit.removeStone();
+                checkGameOver();
+            } else {
+                redo = true;
+                break;
             }
-            startingPit.removeStone();
-            checkGameOver();
         } while(startingPit.getStones() > 0 && gameIsLive);
 
-        log.info("---------");
         log.info("ended on " + currentPit);
+        log.info("ended " + getLastPlayed() + " turn");
+
+        if(!redo) {
+            setLastPlayed(getLastPlayed()
+                    == PlayerPosition.BOTTOM
+                    ? PlayerPosition.TOP
+                    : PlayerPosition.BOTTOM);
+            log.info("changing player to: " + getLastPlayed());
+        }
+        log.info("---------");
     }
 
     private void checkGameOver() {
@@ -74,16 +88,15 @@ public class Game {
                 : getBoard().getPit(startingPit + 1L);
     }
 
-    private boolean isLastEmpty(final Long finalPosition) {
-        return board.getPit(finalPosition).getStones() == 0;
-    }
-
-    private boolean isLegalMove(final Long startingPosition) {
-        if(board.getPit(startingPosition).isHomePit()) {
-            return false;
+    private boolean isLegalMove(final Pit pit) {
+        if(!pit.getOwner().equals(getLastPlayed())) {
+            throw new KalahException("Invalid move. It is " + getLastPlayed().name() + " turn.");
         }
-        if(board.getPit(startingPosition).getStones() <= 0) {
-            return false;
+        if(pit.isHomePit()) {
+            throw new KalahException("Invalid move. Can't select home pit (1/14)");
+        }
+        if(pit.getStones() <= 0) {
+            throw new KalahException("Invalid move. Can't select a pit with 0 stones");
         }
         return true;
     }

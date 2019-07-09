@@ -1,4 +1,4 @@
-package uk.co.erlski.kalah.model.game;
+package uk.co.erlski.kalah.model.enums;
 
 public enum PlayerPosition {
 
