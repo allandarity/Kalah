@@ -21,6 +21,8 @@ public class Game {
     private GameState gameState = GameState.LIVE;
     private final Long gameId;
 
+    private boolean redo = false;
+
     Game(final Long gameId) {
         log.info("game starting at game id " + gameId);
         this.gameId = gameId;
@@ -33,31 +35,31 @@ public class Game {
      * @param startingPosition the id of the {@link Pit} that the turn is starting at
      */
     public void playMove(final Long startingPosition) {
-        boolean redo = false;
-        log.info("Current player set as: " + this.getLastPlayed());
-        final Pit startingPit = board.getPit(startingPosition);
+            log.info("Current player set as: " + this.getLastPlayed());
+            final Pit startingPit = board.getPit(startingPosition);
 
-        Pit currentPit = startingPit;
-        do {
-            if (isLegalMove(startingPit)) {
-                currentPit = handleTurn(startingPit, currentPit);
-            } else {
-                redo = true;
-                break;
+            Pit currentPit = startingPit;
+            do {
+                checkGameOver();
+                if (isLegalMove(startingPit)) {
+                    currentPit = handleTurn(startingPit, currentPit);
+                    System.out.println(startingPit.getMoves());
+                } else {
+                    redo = true;
+                    break;
+                }
+            } while (startingPit.getStones() > 0 && getGameState().equals(GameState.LIVE));
+            System.out.println(startingPit.getMoves());
+            log.info("ended on " + currentPit);
+            log.info("ended " + getLastPlayed() + " turn");
+            if (!redo && getGameState().equals(GameState.LIVE)) {
+                setLastPlayed(getLastPlayed()
+                        == PlayerPosition.BOTTOM
+                        ? PlayerPosition.TOP
+                        : PlayerPosition.BOTTOM);
+                log.info("changing player to: " + getLastPlayed());
             }
-        } while(startingPit.getStones() > 0 && getGameState().equals(GameState.LIVE));
-
-        log.info("ended on " + currentPit);
-        log.info("ended " + getLastPlayed() + " turn");
-
-        if(!redo && getGameState().equals(GameState.LIVE)) {
-            setLastPlayed(getLastPlayed()
-                    == PlayerPosition.BOTTOM
-                    ? PlayerPosition.TOP
-                    : PlayerPosition.BOTTOM);
-            log.info("changing player to: " + getLastPlayed());
-        }
-        log.info("---------");
+            log.info("---------");
     }
 
     /**
@@ -68,27 +70,105 @@ public class Game {
      */
     private Pit handleTurn(Pit startingPit, Pit currentPit) {
         Pit next = getNextPit(currentPit.getPosition());
-        if(startingPit.getStones() == 1 && next.getStones() == 0) {
-            stealStones(getLastPlayed(), next);
+        if(startingPit.getStones() == 0) {
+            return next;
         }
-        next.setStones(1);
-        log.info(next + " added 1 stone" + startingPit.getStones());
-        startingPit.removeStone();
-        checkGameOver();
+
+        if(checkRedoForLastStone(startingPit, next)) {
+            log.info("last stone landed in own house going again");
+            redo = true;
+        }
+
+        if(checkForStoneSteal(startingPit, next)) {
+            stealStones(getLastPlayed(), next);
+            startingPit.removeStone();
+        }
+
+        if(checkAddStone(startingPit, next)) {
+            log.info(next + " added 1 stone" + startingPit.getStones());
+            next.setStones(1);
+            startingPit.removeStone();
+        } else {
+            log.info(next + " passed over");
+        }
         return next;
     }
 
     /**
+     * Checks whether a stone needs to be added to the next pit if it's owned
+     * by the same player.
+     * @param startingPit The pit that either started the turn or is currently
+     *                    being interacted with.
+     * @param nextPit The pit that is next to the pit that is being interacted with
+     * @return Whether a stone should be deposited or move on
+     */
+    private boolean checkAddStone(Pit startingPit, Pit nextPit) {
+        PlayerPosition startingPosition = startingPit.getOwner();
+        if(startingPosition.equals(PlayerPosition.TOP)) {
+            return nextPit.getPosition() != 14;
+        } else {
+            return nextPit.getPosition() != 1;
+        }
+    }
+
+    /**
+     * Checks whether the final stone is being placed into a neighbouring
+     * house that is empty giving another move to the same player.
+     * @param startingPit The pit that either started the turn or is currently
+     *                    being interacted with.
+     * @param nextPit The pit that is next to the pit that is being interacted with
+     * @return Whether there should be another turn for the player
+     */
+    private boolean checkRedoForLastStone(Pit startingPit, Pit nextPit) {
+        return startingPit.getStones() == 1  && nextPit.getOwner().equals(startingPit.getOwner());
+    }
+
+    /**
+     * Check whether a stone should be stolen from the opposite house
+     * @param startingPit The pit that either started the turn or is currently
+     *                    being interacted with.
+     * @param nextPit The pit that is next to the pit that is being interacted with
+     * @return Whether the stones should be stolen from the opposite side
+     */
+    private boolean checkForStoneSteal(Pit startingPit, Pit nextPit) {
+        return startingPit.getOwner().equals(nextPit.getOwner())
+                && startingPit.getStones() == 1 && nextPit.getStones() == 0;
+    }
+
+    /**
      * Check that the game has ended.
-     * Done by adding up the total of the the stones
-     * in the two home pits (1/14).
      */
     private void checkGameOver() {
         Pit topHome = board.getHomePit(PlayerPosition.TOP);
         Pit bottomHome = board.getHomePit(PlayerPosition.BOTTOM);
-        if(topHome.getStones() + bottomHome.getStones() == 72) {
-            setGameState(GameState.FINISHED);
+        if(board.getTotalNumberOfStonesRemaining(PlayerPosition.TOP) == 0
+                || board.getTotalNumberOfStonesRemaining(PlayerPosition.BOTTOM) == 0 ) {
+            PlayerPosition moved = topHome.getStones() == 36 ? topHome.getOwner() : bottomHome.getOwner();
+            PlayerPosition remained = moved.equals(PlayerPosition.TOP) ? PlayerPosition.BOTTOM : PlayerPosition.TOP;
+            setLastPlayed(determineWinner(moved, remained));
         }
+    }
+
+    /**
+     * Determines the winner of the game based on how many stones are in the home pit + any left on the field if applicable
+     * @param moved The player that had all their stones in the pit
+     * @param remained The player that had to move stones to the pit afterwards
+     * @return The {@link PlayerPosition} that has won the game
+     */
+    private PlayerPosition determineWinner(PlayerPosition moved, PlayerPosition remained) {
+        PlayerPosition winner;
+        int movedRemaining = board.getTotalNumberOfStonesRemaining(moved)
+                + board.getHomePit(moved).getStones();
+        int remainedRemaining = board.getTotalNumberOfStonesRemaining(remained)
+                + board.getHomePit(remained).getStones();
+        setGameState(GameState.FINISHED);
+        if( movedRemaining > remainedRemaining ) {
+            winner = moved;
+        } else {
+            winner = remained;
+        }
+        log.info("The game has ended " +getLastPlayed()+ " is the winner");
+        return winner;
     }
 
     /**
@@ -101,21 +181,22 @@ public class Game {
      */
     private void stealStones(final PlayerPosition playerPosition, Pit landed) {
         Pit pitToRemoveStones = board.getPit(landed.getOpposite());
-        System.out.println(pitToRemoveStones);
         int spoils = pitToRemoveStones.getStones();
         pitToRemoveStones.clearPit();
-        board.getHomePit(playerPosition).setStones(spoils);
+        board.getHomePit(playerPosition).setStones(spoils+1);
     }
 
     /**
      * Returns the next legal {@link Pit} to place the stone in.
-     * Home pits (1/14) are not allowed to be directly placed in.
+     * If the pit number is 14 ->
+     *  and the player position = top then place in pit 1
+     *  else if the player position is bottom then skip pit 1 and go to pit 2
      * @param attemptedPit The {@link Pit} that is being attempted to be placed into
      * @return The next legal {@link Pit} that can be placed into
      */
     private Pit getNextPit(final Long attemptedPit) {
-        return attemptedPit == 13
-                ? getBoard().getPit(2L)
+        return attemptedPit == 14L
+                ? getBoard().getPit(1L)
                 : getBoard().getPit(attemptedPit + 1L);
     }
 

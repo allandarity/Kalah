@@ -25,6 +25,10 @@ public class BoardTest {
         board.setupBoard();
     }
 
+    /**
+     * Make sure that the board was correctly set up
+     * on the {@link Game} setup
+     */
     @Test
     public void testSetupBoard() {
         assertNotNull(game.getBoard());
@@ -33,6 +37,9 @@ public class BoardTest {
         assertNotNull(board.getPit(6L));
     }
 
+    /**
+     * Make sure that the board is empties when cleared
+     */
     @Test(expected = KalahException.class)
     public void testClearBoard() {
         assertNotNull(board.getPit(3L));
@@ -44,6 +51,9 @@ public class BoardTest {
         assertNull(board.getPit(6L));
     }
 
+    /**
+     * Return a valid pit by its id
+     */
     @Test
     public void testGetPit() {
         assertNotNull(board.getPit(3L));
@@ -51,17 +61,27 @@ public class BoardTest {
         assertNotNull(board.getPit(6L));
     }
 
+    /**
+     * Fail if trying to get a pit outside the range
+     */
     @Test(expected = KalahException.class)
     public void testGetNonPit() {
         assertNull(board.getPit(35L));
     }
 
+    /**
+     * Return the players home pit based on their {@link PlayerPosition}
+     */
     @Test
     public void testGetHomePit() {
         assertNotNull(board.getHomePit(PlayerPosition.TOP));
         assertNotNull(board.getHomePit(PlayerPosition.BOTTOM));
     }
 
+    /**
+     * Make sure that the home pit that is returned
+     * is correct for the player
+     */
     @Test
     public void testHomePitIsCorrect() {
         final Pit topHome = board.getHomePit(PlayerPosition.TOP);

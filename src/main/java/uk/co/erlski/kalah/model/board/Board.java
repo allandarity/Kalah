@@ -57,6 +57,21 @@ public class Board {
     }
 
     /**
+     * Calculates the number of stones remaining on the field by subtracting the number on the field
+     * by the number in the players home pit.
+     * @param playerPosition The {@link PlayerPosition} to count for
+     * @return The number of stones on the players field
+     */
+    public int getTotalNumberOfStonesRemaining(PlayerPosition playerPosition) {
+        int totalStones = pits.values().stream()
+                .filter(v -> v.getOwner()
+                .equals(playerPosition))
+                .mapToInt(Pit::getStones).sum();
+        int toRemove = getHomePit(playerPosition).getStones();
+        return totalStones - toRemove;
+    }
+
+    /**
      * Creates a <code>Map<Long, Integer></code> that is used to hold
      * the current state of the board in a format that is convertable
      * for {@link uk.co.erlski.kalah.util.Converter#convertToStatusDTO(Long)}

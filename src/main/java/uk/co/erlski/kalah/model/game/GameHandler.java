@@ -55,10 +55,6 @@ public class GameHandler {
         game.getBoard().setupBoard();
     }
 
-    public void endGame(final Game game) {
-        game.getBoard().clearBoard();
-    }
-
     /**
      * Takes an input of a gameId and checks it against the map to make sure
      * that a valid game exists.

@@ -13,6 +13,7 @@ public class Pit {
     private Long opposite = null;
     private PlayerPosition owner;
     private int stones = 6;
+    private int moves = 0;
 
     Pit(final Long position) {
         this.position = position;
@@ -26,9 +27,6 @@ public class Pit {
         }
         setOpposite();
     }
-
-
-    //TODO: this needs cleaning up/replacing
 
     /**
      * Determines and sets the {@link Pit} that lives
@@ -64,7 +62,8 @@ public class Pit {
     }
 
     public void removeStone() {
-        this.stones -= 1;
+        if(this.stones != 0)
+            this.stones -= 1;
     }
 
     public void clearPit() {
@@ -93,6 +92,18 @@ public class Pit {
 
     public void setStoneCount(final int stones) {
         this.stones = stones;
+    }
+
+    public void setMoves(final int moves) {
+        this.moves = moves;
+    }
+
+    public int getMoves() {
+        return this.moves;
+    }
+
+    public void removeMove(final int move) {
+        this.moves -= move;
     }
 
     @Override
