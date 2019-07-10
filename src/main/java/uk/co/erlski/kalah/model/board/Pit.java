@@ -82,8 +82,8 @@ public class Pit {
         return this.position;
     }
 
-    public int getHomePit() {
-        return this.owner.equals(PlayerPosition.TOP) ? 1 : 14;
+    public Long getHomePit() {
+        return this.owner.equals(PlayerPosition.TOP) ? 1L : 14L;
     }
 
     public PlayerPosition getOwner() {

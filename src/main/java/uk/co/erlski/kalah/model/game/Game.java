@@ -40,6 +40,7 @@ public class Game {
 
             Pit currentPit = startingPit;
             do {
+                redo = false;
                 checkGameOver();
                 if (isLegalMove(startingPit)) {
                     currentPit = handleTurn(startingPit, currentPit);
@@ -120,7 +121,8 @@ public class Game {
      * @return Whether there should be another turn for the player
      */
     private boolean checkRedoForLastStone(Pit startingPit, Pit nextPit) {
-        return startingPit.getStones() == 1  && nextPit.getOwner().equals(startingPit.getOwner());
+        boolean isNextHome = nextPit.getPosition().equals(startingPit.getHomePit());
+        return startingPit.getStones() == 1  && isNextHome;
     }
 
     /**
@@ -131,8 +133,10 @@ public class Game {
      * @return Whether the stones should be stolen from the opposite side
      */
     private boolean checkForStoneSteal(Pit startingPit, Pit nextPit) {
-        return startingPit.getOwner().equals(nextPit.getOwner())
-                && startingPit.getStones() == 1 && nextPit.getStones() == 0;
+        if(!nextPit.getPosition().equals(startingPit.getHomePit()))
+            return startingPit.getOwner().equals(nextPit.getOwner())
+                    && startingPit.getStones() == 1 && nextPit.getStones() == 0;
+        return false;
     }
 
     /**

@@ -198,17 +198,16 @@ public class GameTest {
      */
     @Test
     public void testGetASecondGo() {
-        final Pit startingPit = board.getPit(2L);
-        final Pit nextPit = board.getPit(3L);
-        final Pit thirdPit = board.getPit(4L);
-
-        startingPit.setStoneCount(2);
-        nextPit.setStoneCount(1);
-        thirdPit.setStoneCount(0);
-
+        final Pit startingPit = board.getPit(13L);
+        final Pit secondGo = board.getPit(8L);
+        game.setLastPlayed(PlayerPosition.BOTTOM);
+        startingPit.setStoneCount(1);
+        secondGo.setStoneCount(3);
         game.playMove(startingPit.getPosition());
-
-        assertEquals(PlayerPosition.TOP, game.getLastPlayed());
+        assertEquals(PlayerPosition.BOTTOM, game.getLastPlayed());
+        game.playMove(secondGo.getPosition());
+        assertEquals("Second go didn't happen", 0, secondGo.getStones());
+        game.playMove(2L);
 
     }
 }
