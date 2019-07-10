@@ -86,7 +86,7 @@ public class Game {
     private void checkGameOver() {
         Pit topHome = board.getHomePit(PlayerPosition.TOP);
         Pit bottomHome = board.getHomePit(PlayerPosition.BOTTOM);
-        if(topHome.getStones() + bottomHome.getStones() == 75) {
+        if(topHome.getStones() + bottomHome.getStones() == 72) {
             setGameState(GameState.FINISHED);
         }
     }
