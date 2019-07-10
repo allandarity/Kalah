@@ -6,7 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uk.co.erlski.kalah.model.game.Game;
 import uk.co.erlski.kalah.model.game.GameHandler;
-import uk.co.erlski.kalah.model.game.GameState;
+import uk.co.erlski.kalah.model.enums.GameState;
 import uk.co.erlski.kalah.util.Converter;
 import uk.co.erlski.kalah.exception.KalahException;
 
@@ -18,10 +18,13 @@ import uk.co.erlski.kalah.exception.KalahException;
 @RequestMapping("games")
 public class GameController {
 
-    @Autowired
-    private Converter converter;
-    @Autowired
-    private GameHandler gameHandler;
+    private final Converter converter;
+    private final GameHandler gameHandler;
+
+    public GameController(Converter converter, GameHandler gameHandler) {
+        this.converter = converter;
+        this.gameHandler = gameHandler;
+    }
 
     /**
      * Creates a new {@link Game}

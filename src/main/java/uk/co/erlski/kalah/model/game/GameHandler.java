@@ -2,6 +2,7 @@ package uk.co.erlski.kalah.model.game;
 
 import org.springframework.stereotype.Component;
 import uk.co.erlski.kalah.exception.KalahException;
+import uk.co.erlski.kalah.model.enums.GameState;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +30,9 @@ public class GameHandler {
      * @throws KalahException exception
      */
     public void addGame(final Long gameId) throws KalahException {
+        if(gameId == null) {
+            throw new KalahException("Error. You have not specified a gameId");
+        }
         if(gameId < 0) {
             throw new KalahException("ID is too low");
         }

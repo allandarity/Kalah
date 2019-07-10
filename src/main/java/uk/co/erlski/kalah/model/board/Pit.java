@@ -1,5 +1,6 @@
 package uk.co.erlski.kalah.model.board;
 
+import uk.co.erlski.kalah.exception.KalahException;
 import uk.co.erlski.kalah.model.enums.PlayerPosition;
 
 /**
@@ -56,6 +57,9 @@ public class Pit {
     }
 
     public void setStones(final int noOfStones) {
+        if(noOfStones < 0) {
+            throw new KalahException("Unable to set negative stones");
+        }
         this.stones += noOfStones;
     }
 
@@ -85,6 +89,10 @@ public class Pit {
 
     public PlayerPosition getOwner() {
         return this.owner;
+    }
+
+    public void setStoneCount(final int stones) {
+        this.stones = stones;
     }
 
     @Override

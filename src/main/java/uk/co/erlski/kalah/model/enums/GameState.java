@@ -1,4 +1,6 @@
-package uk.co.erlski.kalah.model.game;
+package uk.co.erlski.kalah.model.enums;
+
+import uk.co.erlski.kalah.model.game.Game;
 
 /**
  * State of the {@link Game} that is being played

@@ -5,6 +5,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import uk.co.erlski.kalah.exception.KalahException;
+import uk.co.erlski.kalah.model.enums.GameState;
 
 import static org.junit.Assert.*;
 
@@ -20,13 +21,13 @@ public class GameHandlerTest {
     @Test
     public void addGame() {
         gameHandler.addGame(2L);
-        Assert.assertNotNull(gameHandler.getValidGame(1L));
-        Assert.assertNotNull(gameHandler.getValidGame(2L));
+        Assert.assertNotNull("Game 1 not created", gameHandler.getValidGame(1L));
+        Assert.assertNotNull("Game 2 not created", gameHandler.getValidGame(2L));
     }
 
     @Test(expected = KalahException.class)
     public void addGameWithSameId() {
-        Assert.assertNotNull(gameHandler.getValidGame(1L));
+        Assert.assertNotNull("Game 1 doesn't exist", gameHandler.getValidGame(1L));
         gameHandler.addGame(1L);
     }
 
@@ -38,7 +39,7 @@ public class GameHandlerTest {
         oldGame.setGameState(GameState.FINISHED);
         gameHandler.addGame(gameId);
         Game newGame = gameHandler.getValidGame(gameId);
-        assertEquals(GameState.LIVE, newGame.getGameState());
+        assertEquals("Game state not set to live", GameState.LIVE, newGame.getGameState());
     }
 
     @Test(expected = KalahException.class)
@@ -58,7 +59,7 @@ public class GameHandlerTest {
 
     @Test
     public void getValidGame() {
-        assertNotNull(gameHandler.getValidGame(1L));
+        assertNotNull("Game 1 doesn't exist", gameHandler.getValidGame(1L));
     }
 
     @Test(expected = KalahException.class)
@@ -75,7 +76,7 @@ public class GameHandlerTest {
     public void removeFinishedGame() {
         Game game = gameHandler.getValidGame(1L);
         game.setGameState(GameState.FINISHED);
-        assertTrue(gameHandler.removeFinishedGame(1L));
+        assertTrue("Finished game not removed", gameHandler.removeFinishedGame(1L));
     }
 
     @Test
@@ -83,7 +84,7 @@ public class GameHandlerTest {
         Game game = gameHandler.getValidGame(1L);
         game.setGameState(GameState.FINISHED);
         gameHandler.removeFinishedGame(1L);
-        assertFalse(gameHandler.getGamesMap().containsKey(1L));
+        assertFalse("Map hasn't cleared finished game", gameHandler.getGamesMap().containsKey(1L));
     }
 
     @After

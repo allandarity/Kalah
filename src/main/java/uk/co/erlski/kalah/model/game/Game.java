@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 import uk.co.erlski.kalah.exception.KalahException;
 import uk.co.erlski.kalah.model.board.Board;
 import uk.co.erlski.kalah.model.board.Pit;
+import uk.co.erlski.kalah.model.enums.GameState;
 import uk.co.erlski.kalah.model.enums.PlayerPosition;
 
 /**
